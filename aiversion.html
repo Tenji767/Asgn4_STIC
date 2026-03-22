@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Doodle Jump Clone</title>
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: #87ceeb;
+    font-family: Arial, sans-serif;
+  }
+
+  canvas {
+    display: block;
+    margin: auto;
+    background: #cceeff;
+  }
+
+  #score {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 20px;
+    color: black;
+  }
+</style>
+</head>
+<body>
+
+<div id="score">Score: 0</div>
+<canvas id="gameCanvas" width="400" height="600"></canvas>
+
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+let score = 0;
+
+// Player
+const player = {
+  x: 180,
+  y: 500,
+  width: 40,
+  height: 40,
+  dx: 0,
+  dy: 0
+};
+
+// Physics
+const gravity = 0.4;
+const jumpForce = -10;
+
+// Platforms
+let platforms = [];
+
+function createPlatforms() {
+  platforms = [];
+  for (let i = 0; i < 7; i++) {
+    platforms.push({
+      x: Math.random() * 350,
+      y: i * 90,
+      width: 60,
+      height: 10
+    });
+  }
+}
+
+createPlatforms();
+
+// Controls
+document.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowLeft") player.dx = -5;
+  if (e.key === "ArrowRight") player.dx = 5;
+});
+
+document.addEventListener("keyup", () => {
+  player.dx = 0;
+});
+
+// Game loop
+function update() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Apply movement
+  player.x += player.dx;
+  player.dy += gravity;
+  player.y += player.dy;
+
+  // Wrap around screen
+  if (player.x > canvas.width) player.x = -player.width;
+  if (player.x + player.width < 0) player.x = canvas.width;
+
+  // Platform collision
+  platforms.forEach(p => {
+    if (
+      player.dy > 0 &&
+      player.x < p.x + p.width &&
+      player.x + player.width > p.x &&
+      player.y + player.height < p.y + 10 &&
+      player.y + player.height + player.dy >= p.y
+    ) {
+      player.dy = jumpForce;
+    }
+  });
+
+  // Scroll screen
+  if (player.y < 250) {
+    let diff = 250 - player.y;
+    player.y = 250;
+
+    platforms.forEach(p => {
+      p.y += diff;
+    });
+
+    score += Math.floor(diff);
+    document.getElementById("score").innerText = "Score: " + score;
+  }
+
+  // Remove and add platforms
+  platforms = platforms.filter(p => p.y < canvas.height);
+  while (platforms.length < 7) {
+    platforms.push({
+      x: Math.random() * 350,
+      y: -10,
+      width: 60,
+      height: 10
+    });
+  }
+
+  // Game over
+  if (player.y > canvas.height) {
+    alert("Game Over! Score: " + score);
+    document.location.reload();
+  }
+
+  draw();
+  requestAnimationFrame(update);
+}
+
+function draw() {
+  // Player
+  ctx.fillStyle = "green";
+  ctx.fillRect(player.x, player.y, player.width, player.height);
+
+  // Platforms
+  ctx.fillStyle = "black";
+  platforms.forEach(p => {
+    ctx.fillRect(p.x, p.y, p.width, p.height);
+  });
+}
+
+update();
+</script>
+
+</body>
+</html>
