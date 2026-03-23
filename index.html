@@ -20,8 +20,50 @@ const PLATFORM_HEIGHT = 10;
 const DOODLE_WIDTH = 50; //distance from center
 const DOODLE_HEIGHT = 100;
 
+//generate canvas, taken from game assignment 2
+
+window.onload = function() { //waits until window is loaded
+    console.log("Hello World!");
+
+    canvas = document.getElementById('gameCanvas');
+    canvasContext = canvas.getContext('2d'); //retrieves state of canvas and sets it to variable
+
+    canvas.width = 400;
+    canvas.height = 800;
+    var framesPerSecond = 45;
+    setInterval(function() {
+        //put in drawing functions here
+    }, 1000/framesPerSecond);//will now run every 1000 ticks, one second
+}
 
 
+//create platforms
+function drawPlatform(){
+
+    let platforms = [];
+
+    for (i = 0;i < 9;i++)//randomizes horizontal position and sets other platform variables
+    var platformX = Math.random() * 400
+    var platformY = i * 50;
+    platforms.push({platformX, platformY, PLATFORM_WIDTH, PLATFORM_HEIGHT});
+}
+
+
+//player creation and bounce
+
+
+//scroll up (move platforms down and make new ones)
+
+if(doodleY < 300){
+    
+
+}
+
+
+//movement
+document.addEventListener("keydown", ()=>{
+
+})
 
 
 
