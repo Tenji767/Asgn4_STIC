@@ -12,7 +12,9 @@
 <script>
 
 var doodleAcceleration = 9.8;
-var doodleSpeed
+var doodleSpeed;
+var canvasContext;
+var canvas;
 
 
 const PLATFORM_WIDTH = 200;
@@ -23,6 +25,7 @@ const DOODLE_HEIGHT = 100;
 //generate canvas, taken from game assignment 2
 
 window.onload = function() { //waits until window is loaded
+    
     console.log("Hello World!");
 
     canvas = document.getElementById('gameCanvas');
@@ -45,13 +48,28 @@ function drawPlatform(){
     for (i = 0;i < 9;i++)//randomizes horizontal position and sets other platform variables
     var platformX = Math.random() * 400
     var platformY = i * 50;
-    platforms.push({platformX, platformY, PLATFORM_WIDTH, PLATFORM_HEIGHT});
+    platforms.push({
+        x: platformX, 
+        y: platformY, 
+        width: PLATFORM_WIDTH, 
+        height: PLATFORM_HEIGHT
+    });
 }
 
 
-//player creation and bounce
+//player creation and jump
+
+function drawPlayer(){
+    canvasContext.fillRect(doodleX, doodleY, DOODLE_WIDTH, DOODLE_HEIGHT);//left x, top y, how much right, how much down
+    canvasContext.fillStyle = "green";
+}
+
+//player fall and bounce
 
 
+function bounce(){
+    
+}
 //scroll up (move platforms down and make new ones)
 
 if(doodleY < 300){
