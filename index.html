@@ -15,29 +15,50 @@ var doodleAcceleration = 9.8;
 var doodleSpeed;
 var canvasContext;
 var canvas;
-var doodleX = 350;
+var doodleX = 175;
 var doodleY = 700
+const DOODLE_WIDTH = 30;
+const DOODLE_HEIGHT = 30;
+    let platforms = [];
+    let player = {
+        x: doodleX,
+        y: doodleY,
+        width: DOODLE_WIDTH,
+        height: DOODLE_HEIGHT,
+        dx: 0,
+        dy: 0
+    };
 
-
-const PLATFORM_WIDTH = 200;
+const PLATFORM_WIDTH = 70;
 const PLATFORM_HEIGHT = 10;
-const DOODLE_WIDTH = 50; //distance from center
-const DOODLE_HEIGHT = 100;
+
 
 //generate canvas, taken from game assignment 2
+
 
 window.onload = function() { //waits until window is loaded
     
     console.log("Hello World!");
 
-    canvas = document.getElementById('gameCanvas');
+    canvas = document.getElementById('gamecanvas');
     canvasContext = canvas.getContext('2d'); //retrieves state of canvas and sets it to variable
 
     canvas.width = 400;
     canvas.height = 800;
     var framesPerSecond = 45;
+
+    canvasContext.fillStyle = "cyan";
+    canvasContext.fillRect(0,0,canvas.width,canvas.height);
+
+
+
+
+
+    generatePlatform();
     setInterval(function() {
         //put in drawing functions here
+        draw();
+
     }, 1000/framesPerSecond);//will now run every 1000 ticks, one second
 }
 
@@ -46,14 +67,15 @@ window.onload = function() { //waits until window is loaded
 //draw everything
 
 function draw() {
-  // Player
+//   // Player
   canvasContext.fillStyle = "green";
   canvasContext.fillRect(player.x, player.y, player.width, player.height);
+
 
   // Platforms
   canvasContext.fillStyle = "black";
   platforms.forEach(p => {
-    ctx.fillRect(p.x, p.y, p.width, p.height);
+    canvasContext.fillRect(p.x, p.y, p.width, p.height);
   });
 }
 
@@ -61,11 +83,11 @@ function draw() {
 //create platforms
 function generatePlatform(){
 
-    let platforms = [];
 
-    for (i = 0;i < 9;i++)//randomizes horizontal position and sets other platform variables
-    var platformX = Math.random() * 400
-    var platformY = i * 50;
+
+    for (i = 0;i < 9;i++){//randomizes horizontal position and sets other platform variables, ten platforms
+    var platformX = Math.random() * 330;
+    var platformY = canvas.height - (i * 100) - 20;
     platforms.push({
         x: platformX, 
         y: platformY, 
@@ -73,9 +95,14 @@ function generatePlatform(){
         height: PLATFORM_HEIGHT
     });
 }
+}
 
 
-//player creation and jump
+//player creation
+
+function createPlayer(){
+
+}
 
 
 
