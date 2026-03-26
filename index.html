@@ -57,12 +57,31 @@ window.onload = function() { //waits until window is loaded
     generatePlatform();//fills the platform array with platforms
     setInterval(function() {
         //put in drawing functions here
+        update();
         draw(); 
         playerFall();
+        scrollUp();
     }, 1000/framesPerSecond);//will now run every 1000 ticks, one second
+
+
 }
 
+//movement left and right
+document.addEventListener("keydown", ()=>{
+    if (event.key === "ArrowLeft"){
+        player.dx -= 10;
+    }
+    if (event.key === "ArrowRight"){
+        player.dx += 10;
+    }
+})
+document.addEventListener("keyup", ()=>{
+    player.dx = 0;
+})
 
+function update(){
+    player.x += player.dx;
+}
 
 //draw everything according to thr values recorded in the arrays
 
@@ -99,31 +118,32 @@ function generatePlatform(){
         height: PLATFORM_HEIGHT
     });
 }
+
+
+
 }
-
-
 //player speed/bounce, put after draw to calculate new speed.
 
 function playerFall(){//if dy is negative, the player is falling
+    player.dy -= .5;//gravity, increases the speed of the fall
     player.y -= player.dy;
-    player.dy -= 1;
-
-
 
 
     if (player.dy<0){
         platforms.forEach(platform => {
-            if ((
-                (((player.y + DOODLE_HEIGHT) == (platform.y)) && (player.x>platform.x) && (player.x<(platform.x+PLATFORM_WIDTH)))//if the player is at the same vertical level as the platform and if the left edge is in between the x values of the platform
+            if (
+                ((player.y + DOODLE_HEIGHT) >= (platform.y)) &&
+                ((player.y + DOODLE_HEIGHT) <= (platform.y + PLATFORM_HEIGHT))
+                
+                && (
+                (player.x>platform.x) && 
+                (player.x<(platform.x+PLATFORM_WIDTH))//if the player is at the same vertical level as the platform and if the left edge is in between the x values of the platform
                 ||
+                ((player.x+DOODLE_WIDTH)>platform.x) && 
+                ((player.x+DOODLE_WIDTH)<(platform.x+PLATFORM_WIDTH))//if the player is at the same vertical level as the platform  and if the right edge is between the x values of the platform
 
-        
-                (((player.y + DOODLE_HEIGHT) == (platform.y)) && ((player.x+DOODLE_WIDTH)>platform.x) && ((player.x+DOODLE_WIDTH)<(platform.x+PLATFORM_WIDTH)))//if the player is at the same vertical level as the platform  and if the right edge is between the x values of the platform
-
-                ||
-                ((player.y+DOODLE_HEIGHT)>canvas.height)
             )
-            
+            || ((player.y+DOODLE_HEIGHT)>canvas.height)
         ){
                 player.dy = 20;
             }
@@ -133,24 +153,32 @@ function playerFall(){//if dy is negative, the player is falling
 
 
 
-//player fall and bounce
 
-
-function bounce(){
-
-}
 //scroll up (move platforms down and make new ones)
 
-if(doodleY < 300){
-    
-
+function scrollUp(){
+if(player.y < 300){
+    platforms.forEach(platform =>{
+        platform.y += player.dy;//moves platforms down by the speed of the player, so they move faster as the player moves faster
+        if (platform.y > canvas.height){
+            platforms.splice(platforms.indexOf(platform),1);
+            var platformX = Math.random() * 330;
+            var platformY = 0;
+            platforms.push({
+                x: platformX, 
+                y: platformY, 
+                width: PLATFORM_WIDTH, 
+                height: PLATFORM_HEIGHT
+            });
+        }
+    });
+    player.y += player.dy;//moves player down by the speed of the player, so they move faster as the player moves faster
 }
 
 
-//movement
-document.addEventListener("keydown", ()=>{
 
-})
+
+}
 
 
 
