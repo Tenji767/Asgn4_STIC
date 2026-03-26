@@ -26,7 +26,7 @@ const DOODLE_HEIGHT = 30;
         width: DOODLE_WIDTH,
         height: DOODLE_HEIGHT,
         dx: 0,
-        dy: 0
+        dy: 20
     };
 
 const PLATFORM_WIDTH = 70;
@@ -38,38 +38,42 @@ const PLATFORM_HEIGHT = 10;
 
 window.onload = function() { //waits until window is loaded
     
-    console.log("Hello World!");
+    console.log("Hello World!");//tests to make sure it works
 
     canvas = document.getElementById('gamecanvas');
     canvasContext = canvas.getContext('2d'); //retrieves state of canvas and sets it to variable
 
-    canvas.width = 400;
+    canvas.width = 400;//set canvas size and fps
     canvas.height = 800;
-    var framesPerSecond = 45;
+    var framesPerSecond = 60;
 
-    canvasContext.fillStyle = "cyan";
+    canvasContext.fillStyle = "cyan";//background
     canvasContext.fillRect(0,0,canvas.width,canvas.height);
 
 
 
 
 
-    generatePlatform();
+    generatePlatform();//fills the platform array with platforms
     setInterval(function() {
         //put in drawing functions here
-        draw();
-
+        draw(); 
+        playerFall();
     }, 1000/framesPerSecond);//will now run every 1000 ticks, one second
 }
 
 
 
-//draw everything
+//draw everything according to thr values recorded in the arrays
 
 function draw() {
+    canvasContext.fillStyle = "cyan";//background
+    canvasContext.fillRect(0,0,canvas.width,canvas.height);
+
+
 //   // Player
   canvasContext.fillStyle = "green";
-  canvasContext.fillRect(player.x, player.y, player.width, player.height);
+  canvasContext.fillRect(player.x, player.y, player.width, +player.height);
 
 
   // Platforms
@@ -98,10 +102,33 @@ function generatePlatform(){
 }
 
 
-//player creation
+//player speed/bounce, put after draw to calculate new speed.
 
-function createPlayer(){
+function playerFall(){//if dy is negative, the player is falling
+    player.y -= player.dy;
+    player.dy -= 1;
 
+
+
+
+    if (player.dy<0){
+        platforms.forEach(platform => {
+            if ((
+                (((player.y + DOODLE_HEIGHT) == (platform.y)) && (player.x>platform.x) && (player.x<(platform.x+PLATFORM_WIDTH)))//if the player is at the same vertical level as the platform and if the left edge is in between the x values of the platform
+                ||
+
+        
+                (((player.y + DOODLE_HEIGHT) == (platform.y)) && ((player.x+DOODLE_WIDTH)>platform.x) && ((player.x+DOODLE_WIDTH)<(platform.x+PLATFORM_WIDTH)))//if the player is at the same vertical level as the platform  and if the right edge is between the x values of the platform
+
+                ||
+                ((player.y+DOODLE_HEIGHT)>canvas.height)
+            )
+            
+        ){
+                player.dy = 20;
+            }
+        })
+    }
 }
 
 
