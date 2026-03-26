@@ -15,6 +15,8 @@ var doodleAcceleration = 9.8;
 var doodleSpeed;
 var canvasContext;
 var canvas;
+var doodleX = 350;
+var doodleY = 700
 
 
 const PLATFORM_WIDTH = 200;
@@ -40,8 +42,24 @@ window.onload = function() { //waits until window is loaded
 }
 
 
+
+//draw everything
+
+function draw() {
+  // Player
+  canvasContext.fillStyle = "green";
+  canvasContext.fillRect(player.x, player.y, player.width, player.height);
+
+  // Platforms
+  canvasContext.fillStyle = "black";
+  platforms.forEach(p => {
+    ctx.fillRect(p.x, p.y, p.width, p.height);
+  });
+}
+
+
 //create platforms
-function drawPlatform(){
+function generatePlatform(){
 
     let platforms = [];
 
@@ -59,16 +77,13 @@ function drawPlatform(){
 
 //player creation and jump
 
-function drawPlayer(){
-    canvasContext.fillRect(doodleX, doodleY, DOODLE_WIDTH, DOODLE_HEIGHT);//left x, top y, how much right, how much down
-    canvasContext.fillStyle = "green";
-}
+
 
 //player fall and bounce
 
 
 function bounce(){
-    
+
 }
 //scroll up (move platforms down and make new ones)
 
