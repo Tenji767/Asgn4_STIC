@@ -17,6 +17,7 @@ var canvasContext;
 var canvas;
 var doodleX = 175;
 var doodleY = 700
+
 const DOODLE_WIDTH = 30;
 const DOODLE_HEIGHT = 30;
     let platforms = [];
@@ -26,7 +27,7 @@ const DOODLE_HEIGHT = 30;
         width: DOODLE_WIDTH,
         height: DOODLE_HEIGHT,
         dx: 0,
-        dy: 20
+        dy: 5
     };
 
 const PLATFORM_WIDTH = 70;
@@ -45,7 +46,7 @@ window.onload = function() { //waits until window is loaded
 
     canvas.width = 400;//set canvas size and fps
     canvas.height = 800;
-    var framesPerSecond = 60;
+    var framesPerSecond = 600;
 
     canvasContext.fillStyle = "cyan";//background
     canvasContext.fillRect(0,0,canvas.width,canvas.height);
@@ -69,10 +70,10 @@ window.onload = function() { //waits until window is loaded
 //movement left and right
 document.addEventListener("keydown", ()=>{
     if (event.key === "ArrowLeft"){
-        player.dx -= 10;
+        player.dx = -1.5;
     }
     if (event.key === "ArrowRight"){
-        player.dx += 10;
+        player.dx = 1.5;
     }
 })
 document.addEventListener("keyup", ()=>{
@@ -125,7 +126,7 @@ function generatePlatform(){
 //player speed/bounce, put after draw to calculate new speed.
 
 function playerFall(){//if dy is negative, the player is falling
-    player.dy -= .5;//gravity, increases the speed of the fall
+    player.dy -= .05;//gravity, increases the speed of the fall
     player.y -= player.dy;
 
 
@@ -143,9 +144,9 @@ function playerFall(){//if dy is negative, the player is falling
                 ((player.x+DOODLE_WIDTH)<(platform.x+PLATFORM_WIDTH))//if the player is at the same vertical level as the platform  and if the right edge is between the x values of the platform
 
             )
-            || ((player.y+DOODLE_HEIGHT)>canvas.height)
+            // || ((player.y+DOODLE_HEIGHT)>canvas.height)
         ){
-                player.dy = 20;
+                player.dy = 5;
             }
         })
     }
@@ -180,6 +181,13 @@ if(player.y < 300){
 
 }
 
+//GAME OVER
+
+function checkLose(){
+    if (player.y+DOODLE_HEIGHT >= canvas.height){
+
+    }
+}
 
 
 </script>
