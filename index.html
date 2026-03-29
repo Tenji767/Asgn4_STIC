@@ -1,204 +1,281 @@
 <!--Let's do this-->
 
-<!DOCTYPE html>
+<!doctype html>
 <html>
+  <head>
+    <!--Centers the game-->
+    <style>
+      body {
+        margin: 0;
+        display: flex;
+        justify-content: center; /* Centers horizontally */
+        align-items: center; /* Centers vertically */
+        height: 100vh; /* Full screen height */
+        background-color: #222; /* Makes background black for a better look */
+      }
 
-<head>
+      canvas {
+        border: 2px solid black; /* Border */
+      }
+    </style>
+  </head>
 
-</head>
+  <canvas id="gamecanvas"></canvas>
 
-<canvas id="gamecanvas"></canvas>
+  <script>
+    var doodleAcceleration = 9.8;
+    var doodleSpeed;
+    var canvasContext;
+    var canvas;
+    var doodleX = 175;
+    var doodleY = 600;
+    var points = 0;
 
-<script>
-
-var doodleAcceleration = 9.8;
-var doodleSpeed;
-var canvasContext;
-var canvas;
-var doodleX = 175;
-var doodleY = 600
-
-const DOODLE_WIDTH = 30;
-const DOODLE_HEIGHT = 30;
+    const DOODLE_WIDTH = 30;
+    const DOODLE_HEIGHT = 30;
     let platforms = [];
     let player = {
-        x: doodleX,
-        y: doodleY,
-        width: DOODLE_WIDTH,
-        height: DOODLE_HEIGHT,
-        dx: 0,
-        dy: 5
+      x: doodleX,
+      y: doodleY,
+      width: DOODLE_WIDTH,
+      height: DOODLE_HEIGHT,
+      dx: 0,
+      dy: 5,
     };
 
-const PLATFORM_WIDTH = 70;
-const PLATFORM_HEIGHT = 10;
+    const PLATFORM_WIDTH = 70;
+    const PLATFORM_HEIGHT = 10;
 
+    var scrollAccumulator = 0;
+    var pathX = 600;
 
-//generate canvas, taken from game assignment 2
+    // Tracks the Y position of the last guaranteed path platform so new ones
+    // spawned during scrolling stay spaced within jumpable range
+    var lastPathY = 0;
+    const MAX_JUMP_GAP = 100; // vertical spacing between path platforms, matches row spacing in generatePlatform()
 
+    //generate canvas, taken from game assignment 2
 
-window.onload = function() { //waits until window is loaded
-    
-    console.log("Hello World!");//tests to make sure it works
+    window.onload = function () {
+      //waits until window is loaded
 
-    canvas = document.getElementById('gamecanvas');
-    canvasContext = canvas.getContext('2d'); //retrieves state of canvas and sets it to variable
+      console.log("Hello World!"); //tests to make sure it works
 
-    canvas.width = 400;//set canvas size and fps
-    canvas.height = 800;
-    var framesPerSecond = 600;
+      canvas = document.getElementById("gamecanvas");
+      canvasContext = canvas.getContext("2d"); //retrieves state of canvas and sets it to variable
 
-    canvasContext.fillStyle = "cyan";//background
-    canvasContext.fillRect(0,0,canvas.width,canvas.height);
+      canvas.width = 1200; //set canvas size and fps
+      canvas.height = 800;
+      var framesPerSecond = 600;
 
+      canvasContext.fillStyle = "cyan"; //background
+      canvasContext.fillRect(0, 0, canvas.width, canvas.height);
 
-
-
-
-    generatePlatform();//fills the platform array with platforms
-    setInterval(function() {
+      generateStartingPlatform();
+      //fills the platform array with platforms
+      generatePlatform();
+      setInterval(function () {
         //put in drawing functions here
         update();
-        draw(); 
+        draw();
         playerFall();
         scrollUp();
         checkLose();
-    }, 1000/framesPerSecond);//will now run every 1000 ticks, one second
+      }, 1000 / framesPerSecond); //will now run every 1000 ticks, one second
+    };
 
-
-}
-
-//movement left and right
-document.addEventListener("keydown", ()=>{
-    if (event.key === "ArrowLeft"){
+    //movement left and right
+    document.addEventListener("keydown", () => {
+      if (event.key === "ArrowLeft") {
         player.dx = -1.5;
-    }
-    if (event.key === "ArrowRight"){
+      }
+      if (event.key === "ArrowRight") {
         player.dx = 1.5;
-    }
-})
-document.addEventListener("keyup", ()=>{
-    player.dx = 0;
-})
-
-function update(){
-    player.x += player.dx;
-}
-
-//draw everything according to thr values recorded in the arrays
-
-function draw() {
-    canvasContext.fillStyle = "cyan";//background
-    canvasContext.fillRect(0,0,canvas.width,canvas.height);
-
-
-//   // Player
-  canvasContext.fillStyle = "green";
-  canvasContext.fillRect(player.x, player.y, player.width, +player.height);
-
-
-  // Platforms
-  canvasContext.fillStyle = "black";
-  platforms.forEach(p => {
-    canvasContext.fillRect(p.x, p.y, p.width, p.height);
-  });
-}
-
-
-//create platforms
-function generatePlatform(){
-
-
-
-    for (i = 0;i < 9;i++){//randomizes horizontal position and sets other platform variables, ten platforms
-    var platformX = Math.random() * 330;
-    var platformY = canvas.height - (i * 100) - 20;
-    platforms.push({
-        x: platformX, 
-        y: platformY, 
-        width: PLATFORM_WIDTH, 
-        height: PLATFORM_HEIGHT
+      }
     });
-}
+    document.addEventListener("keyup", () => {
+      player.dx = 0;
+    });
 
+    function update() {
+      player.x += player.dx;
 
+      if (player.x > canvas.width) {
+        player.x = -player.width;
+      }
 
-}
-//player speed/bounce, put after draw to calculate new speed.
-
-function playerFall(){//if dy is negative, the player is falling
-    player.dy -= .05;//gravity, increases the speed of the fall
-    player.y -= player.dy;
-
-
-    if (player.dy<0){
-        platforms.forEach(platform => {
-            if (
-                ((player.y + DOODLE_HEIGHT) >= (platform.y)) &&
-                ((player.y + DOODLE_HEIGHT) <= (platform.y + PLATFORM_HEIGHT))
-                
-                && (
-                (player.x>platform.x) && 
-                (player.x<(platform.x+PLATFORM_WIDTH))//if the player is at the same vertical level as the platform and if the left edge is in between the x values of the platform
-                ||
-                ((player.x+DOODLE_WIDTH)>platform.x) && 
-                ((player.x+DOODLE_WIDTH)<(platform.x+PLATFORM_WIDTH))//if the player is at the same vertical level as the platform  and if the right edge is between the x values of the platform
-
-            )
-            // || ((player.y+DOODLE_HEIGHT)>canvas.height)
-        ){
-                player.dy = 5;
-            }
-        })
+      if (player.x + player.width < 0) {
+        player.x = canvas.width;
+      }
     }
-}
 
+    //draw everything according to thr values recorded in the arrays
 
+    function draw() {
+      canvasContext.fillStyle = "cyan"; //background
+      canvasContext.fillRect(0, 0, canvas.width, canvas.height);
 
+      //   // Player
+      canvasContext.fillStyle = "green";
+      canvasContext.fillRect(player.x, player.y, player.width, player.height);
 
-//scroll up (move platforms down and make new ones)
+      // Platforms
+      canvasContext.fillStyle = "black";
+      platforms.forEach((p) => {
+        canvasContext.fillRect(p.x, p.y, p.width, p.height);
+      });
 
-function scrollUp(){
-if(player.y < 300){
-    platforms.forEach(platform =>{
-        platform.y += player.dy;//moves platforms down by the speed of the player, so they move faster as the player moves faster
-        if (platform.y > canvas.height){
-            platforms.splice(platforms.indexOf(platform),1);
-            var platformX = Math.random() * 330;
-            var platformY = 0;
-            platforms.push({
-                x: platformX, 
-                y: platformY, 
-                width: PLATFORM_WIDTH, 
-                height: PLATFORM_HEIGHT
-            });
+      canvasContext.fillStyle = "black";
+      canvasContext.font = "20px Arial";
+      canvasContext.fillText("Score: " + points, 20, 30);
+    }
+
+    //create platforms
+    function generatePlatform() {
+      for (let i = 0; i < 9; i++) {
+        var platformY = canvas.height - 140 - i * 100;
+
+        // Every row always gets one guaranteed path platform
+        // Drift horizontally with an edge bias so the path meanders naturally
+        var drift = (Math.random() - 0.5) * 400;
+        if (pathX < 200) drift = Math.abs(drift);
+        if (pathX > canvas.width - 200 - PLATFORM_WIDTH)
+          drift = -Math.abs(drift);
+        pathX += drift;
+        pathX = Math.max(0, Math.min(canvas.width - PLATFORM_WIDTH, pathX));
+
+        platforms.push({
+          x: pathX,
+          y: platformY,
+          width: PLATFORM_WIDTH,
+          height: PLATFORM_HEIGHT,
+          isPath: true, // marks it as part of the guaranteed path
+        });
+
+        // Each row also gets 0–1 random bonus platforms
+        var extras = Math.floor(Math.random() * 2);
+        for (let j = 0; j < extras; j++) {
+          platforms.push({
+            x: Math.random() * (canvas.width - PLATFORM_WIDTH),
+            y: platformY + (Math.random() - 0.5) * 40, // slight vertical scatter
+            width: PLATFORM_WIDTH,
+            height: PLATFORM_HEIGHT,
+            isPath: false,
+          });
         }
-    });
-    player.y += player.dy;//moves player down by the speed of the player, so they move faster as the player moves faster
-}
+      }
 
-
-
-
-}
-
-//GAME OVER
-
-function checkLose(){
-    if (player.y+DOODLE_HEIGHT >= canvas.height){
-        alert("Game Over!");
-        platforms = [];
-        generatePlatform();
-            player.x = doodleX;
-            player.y = doodleY;
+      // Remember the topmost path platform Y so scrollUp can continue from there
+      lastPathY = canvas.height - 140 - 8 * 100;
     }
-}
 
+    function generateStartingPlatform() {
+      platforms.push({
+        x: 0,
+        y: canvas.height - 40,
+        width: canvas.width,
+        height: PLATFORM_HEIGHT,
+        isPath: false,
+      });
+    }
 
-</script>
+    //player speed/bounce, put after draw to calculate new speed.
 
+    function playerFall() {
+      //if dy is negative, the player is falling
+      player.dy -= 0.05; //gravity, increases the speed of the fall
+      player.y -= player.dy;
 
+      if (player.dy < 0) {
+        platforms.forEach((platform) => {
+          if (
+            player.y + DOODLE_HEIGHT >= platform.y &&
+            player.y + DOODLE_HEIGHT <= platform.y + platform.height &&
+            // If the player is between the platform start and end
+            player.x + DOODLE_WIDTH > platform.x &&
+            player.x < platform.x + platform.width
+          ) {
+            player.dy = 5;
+          }
+        });
+      }
+    }
 
+    //scroll up (move platforms down and make new ones)
 
+    function scrollUp() {
+      if (player.y < 300) {
+        platforms.forEach((platform) => {
+          platform.y += player.dy; //moves platforms down by the speed of the player, so they move faster as the player moves faster
+        });
 
+        player.y += player.dy; //moves player down by the speed of the player, so they move faster as the player moves faster
+
+        scrollAccumulator += player.dy;
+
+        while (scrollAccumulator >= 10) {
+          points += 1;
+          scrollAccumulator -= 10;
+        }
+
+        // Update lastPathY to reflect how far platforms have shifted down
+        lastPathY += player.dy;
+
+        platforms.forEach((platform) => {
+          if (platform.y > canvas.height) {
+            platforms.splice(platforms.indexOf(platform), 1);
+
+            if (platform.isPath) {
+              // Guaranteed path platform: drift horizontally by a bounded random amount
+              // so the path meanders left/right rather than going straight up
+              var drift = (Math.random() - 0.5) * 400;
+              // Bias the drift away from the edges to avoid getting stuck at one side
+              if (pathX < 200) drift = Math.abs(drift);
+              if (pathX > canvas.width - 200 - PLATFORM_WIDTH)
+                drift = -Math.abs(drift);
+              pathX += drift;
+              pathX = Math.max(
+                0,
+                Math.min(canvas.width - PLATFORM_WIDTH, pathX),
+              );
+
+              lastPathY -= MAX_JUMP_GAP;
+
+              platforms.push({
+                x: pathX,
+                y: lastPathY,
+                width: PLATFORM_WIDTH,
+                height: PLATFORM_HEIGHT,
+                isPath: true,
+              });
+            } else {
+              // Random bonus platform: placed freely near the top
+              platforms.push({
+                x: Math.random() * (canvas.width - PLATFORM_WIDTH),
+                y: Math.random() * 40,
+                width: PLATFORM_WIDTH,
+                height: PLATFORM_HEIGHT,
+                isPath: false,
+              });
+            }
+          }
+        });
+      }
+    }
+
+    //GAME OVER
+
+    function checkLose() {
+      if (player.y + DOODLE_HEIGHT >= canvas.height) {
+        alert("Game Over! Score: " + points);
+        platforms = [];
+        points = 0;
+        scrollAccumulator = 0;
+        generateStartingPlatform();
+        generatePlatform();
+        player.x = doodleX;
+        player.y = doodleY;
+      }
+    }
+  </script>
 </html>
