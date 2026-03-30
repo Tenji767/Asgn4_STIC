@@ -10,13 +10,17 @@
         display: flex;
         justify-content: center; /* Centers horizontally */
         align-items: center; /* Centers vertically */
-        height: 100vh; /* Full screen height */
-        background-color: #222; /* Makes background black for a better look */
+        min-height: 100vh; /* Full screen height */
+        background-image: url("sky.jpg");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
       }
-
-      canvas {
-        border: 2px solid black; /* Border */
-      }
+      /*
+            canvas {
+              border: 2px solid black; /* Border */ /*
+            }
+            */
     </style>
   </head>
 
@@ -68,9 +72,6 @@
       canvas.height = 800;
       var framesPerSecond = 600;
 
-      canvasContext.fillStyle = "cyan"; //background
-      canvasContext.fillRect(0, 0, canvas.width, canvas.height);
-
       generateStartingPlatform();
       //fills the platform array with platforms
       generatePlatform();
@@ -112,10 +113,9 @@
     //draw everything according to thr values recorded in the arrays
 
     function draw() {
-      canvasContext.fillStyle = "cyan"; //background
-      canvasContext.fillRect(0, 0, canvas.width, canvas.height);
+      canvasContext.clearRect(0, 0, canvas.width, canvas.height);
 
-      //   // Player
+      // Player
       canvasContext.fillStyle = "green";
       canvasContext.fillRect(player.x, player.y, player.width, player.height);
 
